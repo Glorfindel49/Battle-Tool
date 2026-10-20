@@ -1,0 +1,224 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Battle Analysis Tool</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1b1b1a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Battle Tool">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+
+<style>
+:root{--bg:#fafaf7;--fg:#222;--card:#fff;--bd:#d8d6cf;--ac:#2d5fa8;--bc:#a83a2d;--mu:#666}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#1b1b1a;--fg:#eee;--card:#262625;--bd:#444;--ac:#6fa3ec;--bc:#ec8a7c;--mu:#aaa}}
+:root[data-theme="dark"]{--bg:#1b1b1a;--fg:#eee;--card:#262625;--bd:#444;--ac:#6fa3ec;--bc:#ec8a7c;--mu:#aaa}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{background:var(--bg);color:var(--fg);font:13px/1.3 system-ui,sans-serif;margin:0;padding:10px;max-width:740px;margin:0}
+h1{font-size:1.1rem;margin:0 0 8px}.row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px}
+.card{min-width:0;background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:8px}
+label{display:flex;justify-content:space-between;align-items:center;gap:6px;margin:4px 0}
+input{width:46px;height:20px;box-sizing:border-box;padding:0 2px;font-size:12px;text-align:center;background:var(--bg);color:var(--fg);border:1px solid var(--bd);border-radius:6px}
+.out{margin-top:0}
+.main{display:flex;flex-wrap:nowrap;gap:8px;align-items:flex-start;max-width:720px}.out{font-size:12px;padding:6px}.out .bar{height:14px}.out .res{flex-wrap:wrap;gap:2px}.left{flex:1 1 0;min-width:0}.out{flex:0 0 230px;width:230px;box-sizing:border-box}.left button{margin-top:10px;margin-bottom:0}
+
+details{margin-top:16px}.bar{display:flex;height:26px;border-radius:6px;overflow:hidden;margin:8px 0}
+.res{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--bd)}
+.mu{color:var(--mu);font-size:11px}.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px}
+.scroll{overflow-x:auto}table{border-collapse:collapse;font-size:.85rem}td,th{border:1px solid var(--bd);padding:2px;text-align:center}
+td input{width:42px;padding:2px;text-align:center}
+.tg{display:flex;align-items:center;gap:8px;cursor:pointer}.tg input{width:auto;position:absolute;opacity:0}
+.tg .yn{display:inline-block;min-width:28px;text-align:center;padding:0 6px;border-radius:10px;border:1px solid var(--bd);color:var(--mu);font-size:.85rem}
+.tg .yn::before{content:"No"}.tg input:checked+.yn{background:var(--ac);color:var(--bg);border-color:var(--ac)}.tg input:checked+.yn::before{content:"Yes"}
+.tg input:focus-visible+.yn{outline:2px solid var(--ac)}
+button{padding:4px 10px;margin-bottom:8px;font-size:.9rem;background:var(--card);color:var(--fg);border:1px solid var(--bd);border-radius:8px;cursor:pointer}
+.pl{display:inline-flex;align-items:center;height:20px;box-sizing:border-box;width:46px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);padding-right:4px}
+.pl input{border:none;background:transparent;width:20px;min-width:0;height:18px;outline:none;padding:0;text-align:right;-moz-appearance:textfield;appearance:textfield}
+.pl input::-webkit-outer-spin-button,.pl input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.pl{padding-left:6px}.sp{display:flex;flex-direction:column;margin-left:auto;font-size:7px;line-height:8px;cursor:pointer;user-select:none}.sp b{font-weight:normal;padding:0 1px;color:var(--mu)}.pl:focus-within{outline:2px solid var(--ac)}
+.res.sub{padding-left:12px;font-size:11px;color:var(--mu)}
+select.mod{background:#b3261e !important;color:#fff !important;border-color:#b3261e !important}
+</style></head><body>
+<h1>Battle Analysis Tool <button type="button" id="rs" style="margin:0 0 0 10px;padding:0 8px;font-size:12px">Reset all</button> <span style="font-weight:normal;font-size:12px;margin-left:10px">Size <button type="button" id="zm" style="margin:0 2px;padding:0 8px">A−</button><button type="button" id="zp" style="margin:0;padding:0 8px">A+</button></span></h1>
+<div class="main"><div class="left">
+<div class="row">
+<div class="card"><b style="color:var(--ac)">Player A</b>
+<select id="pfA" style="width:100%;margin:4px 0;font-size:12px;padding:2px;background:var(--bg);color:var(--fg);border:1px solid var(--bd);border-radius:6px"><option value="">Custom</option><option>Balrog</option><option>Black Guard of Barad Dur</option><option>Black Numenorian Warrior</option><option>Dragon Cult Acolyte</option><option>Durin</option><option>Dwarf Warrior with shield</option><option>Earnur</option><option>Elessar</option><option>Glorfindel</option><option>Glorfindel charging</option><option>Hearthguard</option><option>Iron Guard</option><option>Khazad Guard</option><option>King of the Dead</option><option>Knight of Dol Amroth</option><option>Knight of Minas Tirith (BoF)</option><option>Legolas</option><option>Minas Tirith Captain</option><option>Morannon Orc</option><option>Mordor Orc</option><option>Mordor Orc Blades of Dead</option><option>Mordor Troll</option><option>Morgul Stalker</option><option>Nazgul of Dol Guldur (Khamul)</option><option>Nazgul of Dol Guldur (Slayer of Men)</option><option>Rivendell Elf</option><option>Shagrat</option><option>Uruk-Hai Scout</option><option>Uruk-Hai Scout with Shield</option><option>Warrior of Minas Tirith</option><option>Warrior of Rohan</option><option>Warrior of Rohan with Shield</option><option>Warrior of the Dead</option></select>
+<label>Attacks<input id="aA" type="number" min="1" value="1"></label>
+<label>Fight<input id="fA" type="number" min="1" value="4"></label>
+<label>Strength<input id="sA" type="number" min="1" max="10" value="3"></label>
+<label>Defence<input id="dA" type="number" min="1" max="10" value="5"></label><label>Wounds<input id="wdA" type="number" min="1" value="1"></label><label>Courage<span class="pl"><input id="crA" type="number" min="1" max="10" value="7"><span>+</span><span class="sp"><b data-s="up">▲</b><b data-s="dn">▼</b></span></span></label></div>
+<div class="card"><b style="color:var(--bc)">Player B</b>
+<select id="pfB" style="width:100%;margin:4px 0;font-size:12px;padding:2px;background:var(--bg);color:var(--fg);border:1px solid var(--bd);border-radius:6px"><option value="">Custom</option><option>Balrog</option><option>Black Guard of Barad Dur</option><option>Black Numenorian Warrior</option><option>Dragon Cult Acolyte</option><option>Durin</option><option>Dwarf Warrior with shield</option><option>Earnur</option><option>Elessar</option><option>Glorfindel</option><option>Glorfindel charging</option><option>Hearthguard</option><option>Iron Guard</option><option>Khazad Guard</option><option>King of the Dead</option><option>Knight of Dol Amroth</option><option>Knight of Minas Tirith (BoF)</option><option>Legolas</option><option>Minas Tirith Captain</option><option>Morannon Orc</option><option>Mordor Orc</option><option>Mordor Orc Blades of Dead</option><option>Mordor Troll</option><option>Morgul Stalker</option><option>Nazgul of Dol Guldur (Khamul)</option><option>Nazgul of Dol Guldur (Slayer of Men)</option><option>Rivendell Elf</option><option>Shagrat</option><option>Uruk-Hai Scout</option><option>Uruk-Hai Scout with Shield</option><option>Warrior of Minas Tirith</option><option>Warrior of Rohan</option><option>Warrior of Rohan with Shield</option><option>Warrior of the Dead</option></select>
+<label>Attacks<input id="aB" type="number" min="1" value="1"></label>
+<label>Fight<input id="fB" type="number" min="1" value="4"></label>
+<label>Strength<input id="sB" type="number" min="1" max="10" value="3"></label>
+<label>Defence<input id="dB" type="number" min="1" max="10" value="5"></label><label>Wounds<input id="wdB" type="number" min="1" value="1"></label><label>Courage<span class="pl"><input id="crB" type="number" min="1" max="10" value="7"><span>+</span><span class="sp"><b data-s="up">▲</b><b data-s="dn">▼</b></span></span></label></div>
+</div>
+<button id="tgBtn" type="button">Hide toggles</button>
+<div class="row" id="tgRow" style="margin-top:10px">
+<div class="card"><b style="color:var(--ac)">Player A toggles</b>
+<label>Banner<span class="tg"><input id="bA" type="checkbox"><span class="yn"></span></span></label><label>2 handed<span class="tg"><input id="tA" type="checkbox"><span class="yn"></span></span></label><label>Master forged/burly<span class="tg"><input id="mfA" type="checkbox"><span class="yn"></span></span></label><label>Opponent trapped?<span class="tg"><input id="trA" type="checkbox"><span class="yn"></span></span></label><label>Opponent prone?<span class="tg"><input id="prA" type="checkbox"><span class="yn"></span></span></label><label>Elven blade?<span class="tg"><input id="eA" type="checkbox"><span class="yn"></span></span></label><label>Blades of the dead?<span class="tg"><input id="bdA" type="checkbox"><span class="yn"></span></span></label><label>Drain soul?<span class="tg"><input id="dsA" type="checkbox"><span class="yn"></span></span></label><label>Demon of the ancient world?<span class="tg"><input id="dwA" type="checkbox"><span class="yn"></span></span></label><label>Shield added?<span class="tg"><input id="shA" type="checkbox"><span class="yn"></span></span></label><label>Shieldwall?<span class="tg"><input id="swA" type="checkbox"><span class="yn"></span></span></label><label>Shielding?<span class="tg"><input id="sgA" type="checkbox"><span class="yn"></span></span></label><label>Mounted and charged?<span class="tg"><input id="mcA" type="checkbox"><span class="yn"></span></span></label><label>Lord of the West?<span class="tg"><input id="lwA" type="checkbox"><span class="yn"></span></span></label><label>Master Duellist?<span class="tg"><input id="mdA" type="checkbox"><span class="yn"></span></span></label><label>Cleaving Blow?<span class="tg"><input id="cbA" type="checkbox"><span class="yn"></span></span></label><label>Crown of Kings?<span class="tg"><input id="ckA" type="checkbox"><span class="yn"></span></span></label></div>
+<div class="card"><b style="color:var(--bc)">Player B toggles</b>
+<label>Banner<span class="tg"><input id="bB" type="checkbox"><span class="yn"></span></span></label><label>2 handed<span class="tg"><input id="tB" type="checkbox"><span class="yn"></span></span></label><label>Master forged/burly<span class="tg"><input id="mfB" type="checkbox"><span class="yn"></span></span></label><label>Opponent trapped?<span class="tg"><input id="trB" type="checkbox"><span class="yn"></span></span></label><label>Opponent prone?<span class="tg"><input id="prB" type="checkbox"><span class="yn"></span></span></label><label>Elven blade?<span class="tg"><input id="eB" type="checkbox"><span class="yn"></span></span></label><label>Blades of the dead?<span class="tg"><input id="bdB" type="checkbox"><span class="yn"></span></span></label><label>Drain soul?<span class="tg"><input id="dsB" type="checkbox"><span class="yn"></span></span></label><label>Demon of the ancient world?<span class="tg"><input id="dwB" type="checkbox"><span class="yn"></span></span></label><label>Shield added?<span class="tg"><input id="shB" type="checkbox"><span class="yn"></span></span></label><label>Shieldwall?<span class="tg"><input id="swB" type="checkbox"><span class="yn"></span></span></label><label>Shielding?<span class="tg"><input id="sgB" type="checkbox"><span class="yn"></span></span></label><label>Mounted and charged?<span class="tg"><input id="mcB" type="checkbox"><span class="yn"></span></span></label><label>Lord of the West?<span class="tg"><input id="lwB" type="checkbox"><span class="yn"></span></span></label><label>Master Duellist?<span class="tg"><input id="mdB" type="checkbox"><span class="yn"></span></span></label><label>Cleaving Blow?<span class="tg"><input id="cbB" type="checkbox"><span class="yn"></span></span></label><label>Crown of Kings?<span class="tg"><input id="ckB" type="checkbox"><span class="yn"></span></span></label></div></div>
+</div>
+<div class="out card" id="out"></div></div>
+<details class="card" style="margin-top:12px"><summary>Wound table (editable): rows = attacker Strength, columns = target Defence</summary>
+<p class="mu">Enter a number (roll that or higher) or <code>6/4</code> (roll a 6, then 4+). Values are from memory – please check them against your rulebook.</p>
+<div class="scroll"><table id="tbl"></table></div></details>
+<script>
+const T=[["4","5","5","6","6","6/4","6/5","6/6","6/6","6/6"],
+["4","4","5","5","6","6","6/4","6/5","6/6","6/6"],
+["3","4","4","5","5","6","6","6/4","6/5","6/6"],
+["3","3","4","4","5","5","6","6","6/4","6/5"],
+["3","3","3","4","4","5","5","6","6","6/4"],
+["3","3","3","3","4","4","5","5","6","6"],
+["3","3","3","3","3","4","4","5","5","6"],
+["3","3","3","3","3","3","4","4","5","5"],
+["3","3","3","3","3","3","3","4","4","5"],
+["3","3","3","3","3","3","3","3","4","4"]];
+const $=id=>document.getElementById(id), pct=x=>(100*x).toFixed(1)+"%";
+function killP(s,d,bonus=0){s=Math.min(10,Math.max(1,s));d=Math.min(10,Math.max(1,d));
+ const c=String(T[s-1][d-1]).trim(), s1=n=>Math.min(1,Math.max(0,(7-Math.max(2,n-bonus))/6));
+ if(c.includes("/")){const [a,b]=c.split("/").map(Number);return s1(a)*s1(b);} return s1(Number(c));}
+// Cleaving Blow: probability that a single kill die shows a natural 6 AND succeeds (such a die causes 2 wounds)
+function cleaveP(s,d,bonus=0){s=Math.min(10,Math.max(1,s));d=Math.min(10,Math.max(1,d));
+ const c=String(T[s-1][d-1]).trim(),s1=n=>Math.min(1,Math.max(0,(7-Math.max(2,n-bonus))/6));
+ if(c.includes("/")){const b=Number(c.split("/")[1]);return s1(b)/6;} return 1/6;}
+function dist(n){return [1,2,3,4,5,6].map(i=>Math.pow(i/6,n)-Math.pow((i-1)/6,n));} // P(highest die = i)
+function duel(P,Q){ // P,Q = {n:Stage-1 dice, f:effective Fight, two, mf, rr:rerolls, elf}
+ const a=dist(P.n),b=dist(Q.n);
+ const ef=(pl,m)=>pl.two&&!pl.mf&&m<6?m-1:m; // 2-handed: -1 to each die except a 6 (no penalty with master forged/burly)
+ const win=(x,y)=>x>y?1:x<y?-1:(P.f>Q.f?1:P.f<Q.f?-1:0); // 0 = full tie (same highest die and same Fight)
+ const pT=0.5+((P.elf?1:0)-(Q.elf?1:0))/6; // deciding die: P wins on 1-3 (+1 face per elven blade, -1 for the opponent's)
+ let wA=0,wB=0;
+ // Rerolls (Banner, Lord of the West): the losing side re-rolls its lowest die (best choice; for 1 die, its only die), one reroll at a time while it still has rerolls left.
+ const go=(x,y,rA,rB,p)=>{const w=win(x,y);if(!w){wA+=p*pT;wB+=p*(1-pT);return;}
+  if(w===1){if(rB>0){for(let r=1;r<=6;r++){const nv=ef(Q,r);go(x,Q.n>=2?Math.max(y,nv):nv,rA,rB-1,p/6);}return;}wA+=p;}
+  else{if(rA>0){for(let r=1;r<=6;r++){const nv=ef(P,r);go(P.n>=2?Math.max(x,nv):nv,y,rA-1,rB,p/6);}return;}wB+=p;}};
+ for(let i=0;i<6;i++)for(let j=0;j<6;j++)go(ef(P,i+1),ef(Q,j+1),P.rr,Q.rr,a[i]*b[j]);
+ const s=wA+wB;return [wA/s,wB/s];}
+// distribution of the number of successful wound rolls from n dice (index = successes); lw = reroll one failed die
+function succDist(p,n,lw,p2){
+ if(p2){ // Cleaving Blow: each die causes 0, 1 or 2 wounds (2 when it is a natural 6 that succeeds)
+  const q=[1-p,p-p2,p2];let dp=[[1]]; // dp[w][f]: w wounds so far, f failed dice
+  for(let t=0;t<n;t++){const nd=[];const put=(w,f,v)=>{(nd[w]=nd[w]||[])[f]=((nd[w]||[])[f]||0)+v;};
+   dp.forEach((row,w)=>row&&row.forEach((v,f)=>{if(!v)return;put(w,f+1,v*q[0]);put(w+1,f,v*q[1]);put(w+2,f,v*q[2]);}));dp=nd;}
+  const e=new Array(2*n+1).fill(0);
+  dp.forEach((row,w)=>row&&row.forEach((v,f)=>{if(!v)return;if(lw&&f>=1){for(let x=0;x<3;x++)e[w+x]+=v*q[x];}else e[w]+=v;}));
+  return e;}
+ const d=[];let C=1;for(let k=0;k<=n;k++){if(k>0)C=C*(n-k+1)/k;d.push(C*Math.pow(p,k)*Math.pow(1-p,n-k));}
+ if(!lw||n===0)return d;const e=new Array(n+1).fill(0);
+ for(let k=0;k<=n;k++){if(k<n){e[k]+=d[k]*(1-p);e[k+1]+=d[k]*p;}else e[k]+=d[k];}return e;}
+// Crown of Kings: each wound against the model is ignored on a 1-in-6 chance (a roll of 6), so each wound survives with probability 5/6
+function thin(d,keep){const e=new Array(d.length).fill(0);d.forEach((p,k)=>{let C=1;for(let j=0;j<=k;j++){if(j>0)C=C*(k-j+1)/j;e[j]+=p*C*Math.pow(keep,j)*Math.pow(1-keep,k-j);}});return e;}
+function run(){const v=id=>+$(id).value||1,c=id=>$(id).checked;
+ const side=X=>({n0:v("a"+X),f0:v("f"+X),s:v("s"+X),d:v("d"+X),w:v("wd"+X),cr:v("cr"+X),two:c("t"+X),mf:c("mf"+X),ban:c("b"+X),elf:c("e"+X),
+  lw:c("lw"+X),cb:c("cb"+X),ck:c("ck"+X),md:c("md"+X),sg:c("sg"+X),mc:c("mc"+X),bd:c("bd"+X),ds:c("ds"+X),dw:c("dw"+X),sh:c("sh"+X),sw:c("sw"+X),
+  x2:c("tr"+X)||c("pr"+X),oppProne:c("pr"+X)}); // x2: trapped/prone opponent doubles kill dice
+ const A=side("A"),B=side("B");
+ // Master Duellist: Fight rises to the enemy's Fight if lower
+ const fA=A.md?Math.max(A.f0,B.f0):A.f0,fB=B.md?Math.max(B.f0,A.f0):B.f0;
+ // Stage 1 dice: Attacks (doubled by Shielding) + 1 if mounted and charged. Rerolls: Banner + Lord of the West
+ const st1=(S,f)=>({n:S.n0*(S.sg?2:1)+(S.mc?1:0),f,two:S.two,mf:S.mf,elf:S.elf,rr:(S.ban?1:0)+(S.lw?1:0)});
+ const [pA,pB]=duel(st1(A,fA),st1(B,fB));
+ // Stage 2: distribution of successful wound rolls by the winner (S) against the other model (Z)
+ const stage2=(S,Z)=>{
+  const need=S.ds?(Z.dw?2:1):Z.w; // Drain soul: 1 success (2 against Demon of the ancient world)
+  if(S.sg)return {need,dist:[1]}; // Shielding: no kill roll
+  // dice: (Attacks + 1 if mounted and charged), doubled if mounted-and-charged, trapped or prone opponent (the doublings do not stack)
+  const dice=(S.n0+(S.mc?1:0))*((S.x2||S.mc)?2:1);
+  // Blades of the dead: Defence = 10 - Courage (Shield added does not apply then); otherwise Defence (+1 with Shield added)
+  const def=S.bd?10-Z.cr:Z.d+(Z.sh?1:0)+(Z.sw?1:0);
+  const raw=succDist(killP(S.s,def,S.two?1:0),dice,S.lw,S.cb?cleaveP(S.s,def,S.two?1:0):0);
+  return {need,dist:Z.ck?thin(raw,5/6):raw};};
+ // "Opponent trapped/prone" only affects the player it is set for (doubles their kill dice if they win); a prone model that wins strikes as normal
+ const sA=stage2(A,B),sB=stage2(B,A);
+ const kill=r=>r.dist.reduce((t,x,k)=>k>=r.need?t+x:t,0);
+ const kA=kill(sA),kB=kill(sB);
+ const mix=(col,pc)=>`color-mix(in srgb,var(${col}) ${pc}%,var(--bg))`;
+ const rows=[],segs=[];
+ const addSide=(nm,oth,pw,r,col,rev)=>{ // returns main rows + wound-count sub rows
+  const k=kill(r),part=[];
+  for(let j=0;j<r.need;j++)part.push(r.dist[j]||0); // successes 0..need-1 (target survives)
+  const killRow=[nm+" wins & kills "+oth,pw*k,col==="A"?"var(--ac)":"var(--bc)",0];
+  const surv=[nm+" wins, "+oth+" survives",pw*(1-k),mix(col==="A"?"--ac":"--bc",45)];
+  const subs=r.need>=2?part.map((x,j)=>[(j===0?"no wounds":j+(j===1?" wound":" wounds"))+" caused",pw*x,mix(col==="A"?"--ac":"--bc",20+40*j/r.need)]):[];
+  return {killRow,surv,subs,part};};
+ const a1=addSide("A","B",pA,sA,"A"),b1=addSide("B","A",pB,sB,"B");
+ const bar=[a1.killRow].concat(a1.subs.length?a1.subs.slice().reverse():[a1.surv],b1.subs.length?b1.subs:[b1.surv],[b1.killRow]);
+ const row=(x,cls)=>`<div class="res ${cls||""}"><span><span class="sw" style="background:${x[2]}"></span>${x[0]}</span><b>${pct(x[1])}</b></div>`;
+ $("out").innerHTML=`<div class="bar">${bar.map(x=>`<div style="width:${x[1]*100}%;background:${x[2]}"></div>`).join("")}</div>`+
+  row(a1.killRow)+row(a1.surv)+a1.subs.map(x=>row(x,"sub")).join("")+row(b1.surv)+b1.subs.map(x=>row(x,"sub")).join("")+row(b1.killRow)+
+  `<p class="mu">Duel: A wins ${pct(pA)}, B wins ${pct(pB)}. Kill chance if winning: A ${pct(kA)}, B ${pct(kB)}.</p>`;}
+let h="<tr><th></th>"+[...Array(10)].map((_,i)=>"<th>D"+(i+1)+"</th>").join("")+"</tr>";
+T.forEach((r,i)=>{h+="<tr><th>S"+(i+1)+"</th>"+r.map((c,j)=>`<td><input data-r="${i}" data-c="${j}" value="${c}"></td>`).join("")+"</tr>";});
+$("tbl").innerHTML=h;
+document.addEventListener("change",e=>run());
+document.addEventListener("input",e=>{const t=e.target;if(t.dataset.r!==undefined)T[t.dataset.r][t.dataset.c]=t.value;run();});
+run();
+let zoomL=1;const setZ=d=>{zoomL=Math.min(2,Math.max(0.5,Math.round((zoomL+d)*10)/10));document.body.style.zoom=zoomL;};
+$("zm").addEventListener("click",()=>setZ(-0.1));$("zp").addEventListener("click",()=>setZ(0.1));
+document.addEventListener("click",e=>{const d=e.target.dataset&&e.target.dataset.s;if(!d)return;
+ const i=e.target.closest(".pl").querySelector("input");d==="up"?i.stepUp():i.stepDown();i.dispatchEvent(new Event("input",{bubbles:true}));});
+$("rs").addEventListener("click",()=>{document.querySelectorAll("input").forEach(i=>{
+ if(i.type==="checkbox")i.checked=i.defaultChecked;else{i.value=i.defaultValue;if(i.dataset.r!==undefined)T[i.dataset.r][i.dataset.c]=i.value;}});
+ document.querySelectorAll("select").forEach(x=>x.selectedIndex=0);flagMod("A");flagMod("B");
+ run();syncTg();});
+const PROFILES={ // keys are input ids without the A/B suffix; toggles listed under "on"
+ "King of the Dead":{a:2,f:6,s:4,d:8,wd:2,cr:3,on:["bd","ds"]},
+ "Balrog":{a:4,f:10,s:9,d:9,wd:10,cr:3,on:["dw"]},
+ "Rivendell Elf":{a:1,f:5,s:3,d:5,wd:1,cr:5,on:["e"],pts:10},
+ "Minas Tirith Captain":{a:2,f:5,s:4,d:7,wd:2,cr:6,on:[]},
+ "Glorfindel":{a:3,f:9,s:4,d:7,wd:3,cr:3,on:["e","lw"]},
+ "Glorfindel charging":{a:3,f:9,s:4,d:7,wd:3,cr:3,on:["e","lw","mc"]},
+ "Dwarf Warrior with shield":{a:1,f:4,s:3,d:6,wd:1,cr:6,on:["sh"],pts:9},
+ "Earnur":{a:3,f:6,s:4,d:7,wd:3,cr:4,on:["md"]},
+ "Knight of Minas Tirith (BoF)":{a:1,f:5,s:3,d:6,wd:1,cr:7,on:["t","mf","pr","mc"],pts:15},
+ "Nazgul of Dol Guldur (Slayer of Men)":{a:2,f:5,s:4,d:6,wd:1,cr:4,on:["t","mf"]},
+ "Warrior of Minas Tirith":{a:1,f:4,s:3,d:6,wd:1,cr:7,on:[],pts:9},
+ "Mordor Orc":{a:1,f:3,s:3,d:4,wd:1,cr:8,on:[],pts:6},
+ "Mordor Orc Blades of Dead":{a:1,f:3,s:3,d:4,wd:1,cr:8,on:["bd"]},
+ "Morannon Orc":{a:1,f:3,s:4,d:5,wd:1,cr:8,on:[],pts:9},
+ "Mordor Troll":{a:3,f:7,s:7,d:7,wd:4,cr:6,on:[]},
+ "Elessar":{a:3,f:7,s:4,d:7,wd:3,cr:3,on:["b","e"]},
+ "Legolas":{a:2,f:6,s:4,d:4,wd:2,cr:4,on:["e"]},
+ "Warrior of the Dead":{a:1,f:3,s:3,d:8,wd:1,cr:4,on:["bd"],pts:16},
+ "Black Guard of Barad Dur":{a:1,f:4,s:5,d:6,wd:1,cr:7,on:[],pts:12},
+ "Morgul Stalker":{a:2,f:3,s:4,d:4,wd:1,cr:7,on:[],pts:10},
+ "Black Numenorian Warrior":{a:1,f:4,s:3,d:6,wd:1,cr:6,on:[],pts:10},
+ "Shagrat":{a:3,f:6,s:5,d:5,wd:3,cr:5,on:["cb"],pts:110},
+ "Knight of Dol Amroth":{a:1,f:4,s:3,d:6,wd:1,cr:6,on:[],pts:11},
+ "Warrior of Rohan":{a:1,f:3,s:3,d:4,wd:1,cr:7,on:[],pts:6},
+ "Warrior of Rohan with Shield":{a:1,f:3,s:3,d:4,wd:1,cr:7,on:["sh"],pts:7},
+ "Uruk-Hai Scout":{a:1,f:4,s:4,d:4,wd:1,cr:7,on:[],pts:8},
+ "Uruk-Hai Scout with Shield":{a:1,f:4,s:4,d:4,wd:1,cr:7,on:["sh"],pts:9},
+ "Dragon Cult Acolyte":{a:2,f:4,s:3,d:4,wd:1,cr:6,on:[],pts:11},
+ "Durin":{a:3,f:7,s:4,d:9,wd:3,cr:4,on:["b","t","mf","ck"]},
+ "Hearthguard":{a:1,f:5,s:4,d:7,wd:1,cr:6,on:["t","mf"],pts:14},
+ "Iron Guard":{a:2,f:4,s:4,d:6,wd:1,cr:6,on:[],pts:15},
+ "Khazad Guard":{a:1,f:5,s:4,d:7,wd:1,cr:6,on:[],pts:12},
+ "Nazgul of Dol Guldur (Khamul)":{a:3,f:5,s:4,d:6,wd:1,cr:4,on:["t"]}};
+const TOGGLES=["b","t","mf","tr","pr","e","bd","ds","dw","sh","sw","sg","mc","lw","md","cb","ck"];
+function applyProfile(X){const p=PROFILES[$("pf"+X).value];if(!p)return;
+ ["a","f","s","d","wd","cr"].forEach(k=>$(k+X).value=p[k]);
+ TOGGLES.forEach(k=>$(k+X).checked=p.on.includes(k));
+ flagMod(X);run();syncTg();}
+["A","B"].forEach(X=>$("pf"+X).addEventListener("change",()=>applyProfile(X)));
+// editing any value or toggle by hand keeps the chosen profile name but turns its dropdown red; it clears if the values match the profile again
+function profileMatches(X){const p=PROFILES[$("pf"+X).value];if(!p)return true;
+ return ["a","f","s","d","wd","cr"].every(k=>+$(k+X).value===p[k])&&TOGGLES.every(k=>$(k+X).checked===p.on.includes(k));}
+function flagMod(X){$("pf"+X).classList.toggle("mod",!profileMatches(X));}
+const markCustom=e=>{const t=e.target;if(t.tagName==="SELECT"||!t.id||!/^[a-z]+[AB]$/.test(t.id))return;flagMod(t.id.slice(-1));};
+document.addEventListener("input",markCustom);document.addEventListener("change",markCustom);
+let tgHidden=false;
+function syncTg(){$("tgRow").style.display=tgHidden?"none":"";
+ const on=document.querySelectorAll(".tg input:checked").length;
+ $("tgBtn").textContent=tgHidden?"Show toggles"+(on?" ("+on+" on)":""):"Hide toggles";}
+$("tgBtn").addEventListener("click",()=>{tgHidden=!tgHidden;syncTg();});
+document.addEventListener("change",syncTg);
+</script><script>
+// Offline support: register the service worker (ignored where unsupported, e.g. when previewed outside a web server)
+if("serviceWorker" in navigator){window.addEventListener("load",()=>{try{navigator.serviceWorker.register("sw.js").catch(()=>{});}catch(e){}});}
+</script>
+</body></html>
